@@ -1,0 +1,70 @@
+﻿@model UniversityAdmission.Areas.User.ViewModels.ApplicationCreateViewModel
+
+@{
+    ViewData["Title"] = "Кандидатстване";
+}
+
+<h2>Кандидатстване</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Index" method="post">
+
+            <!-- Validation summary за всички грешки -->
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- Общ бал -->
+            <div class="mb-3">
+                <label class="form-label">Вашият бал</label>
+                <input asp-for="TotalScore" class="form-control" readonly />
+            </div>
+
+            <!-- Таблица с 3 желания -->
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Желание</th>
+                        <th>Специалност</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Желание 1</td>
+                        <td>
+                            <select asp-for="FirstChoiceId" asp-items="Model.Specialities" class="form-select">
+                                <option value="">-- Изберете специалност --</option>
+                            </select>
+                            <span asp-validation-for="FirstChoiceId" class="text-danger"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Желание 2</td>
+                        <td>
+                            <select asp-for="SecondChoiceId" asp-items="Model.Specialities" class="form-select">
+                                <option value="">-- По избор --</option>
+                            </select>
+                            <span asp-validation-for="SecondChoiceId" class="text-danger"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Желание 3</td>
+                        <td>
+                            <select asp-for="ThirdChoiceId" asp-items="Model.Specialities" class="form-select">
+                                <option value="">-- По избор --</option>
+                            </select>
+                            <span asp-validation-for="ThirdChoiceId" class="text-danger"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn btn-primary">
+                Подай кандидатура
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

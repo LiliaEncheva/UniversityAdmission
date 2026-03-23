@@ -1,0 +1,43 @@
+﻿@model UniversityAdmission.Models.Entities.Grade
+
+@{
+    ViewData["Title"] = "Въвеждане на оценки";
+}
+
+<h2 class="mb-4">📝 Въвеждане на оценки</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="UserId" value="@Model.UserId" />
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Diploma" class="form-label"></label>
+        <input asp-for="Diploma" class="form-control" />
+        <span asp-validation-for="Diploma" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BEL" class="form-label"></label>
+        <input asp-for="BEL" class="form-control" />
+        <span asp-validation-for="BEL" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Math" class="form-label"></label>
+        <input asp-for="Math" class="form-control" />
+        <span asp-validation-for="Math" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="English" class="form-label"></label>
+        <input asp-for="English" class="form-control" />
+        <span asp-validation-for="English" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">💾 Запази</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,63 @@
+﻿@model IEnumerable<UniversityAdmission.Areas.Admin.ViewModels.SpecialityViewModel>
+
+
+@{
+    ViewData["Title"] = "Специалности";
+}
+
+<h2 class="admin-title">Специалности</h2>
+
+<div class="card admin-card">
+    <div class="card-header admin-card-header d-flex justify-content-between">
+        <span>Списък със специалности</span>
+        <a asp-action="Create" class="btn btn-light btn-sm">
+            ➕ Добави специалност
+        </a>
+    </div>
+
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                Няма добавени специалности.
+            </div>
+        }
+        else
+        {
+            <table class="table admin-table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Име</th>
+                        <th>Брой места</th>
+                        <th class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var s in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@s.Name</td>
+                                <td>@s.Seats</td>
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-id="@s.Id"
+                                       class="btn btn-warning btn-sm admin-action-btn">
+                                        ✏️ Редактирай
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@s.Id"
+                                       class="btn btn-danger btn-sm admin-action-btn">
+                                        🗑 Изтрий
+                                    </a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

@@ -1,0 +1,25 @@
+﻿@model UniversityAdmission.Areas.Admin.ViewModels.SpecialityViewModel
+
+@{
+    ViewData["Title"] = "Изтрий специалност";
+}
+
+<h2>Изтрий специалност</h2>
+
+<h4>Сигурни ли сте, че искате да изтриете тази специалност?</h4>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Име</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">Брой места</dt>
+        <dd class="col-sm-10">@Model.Seats</dd>
+    </dl>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Да, изтрий</button>
+    <a asp-action="Index" class="btn btn-secondary">Откажи</a>
+</form>

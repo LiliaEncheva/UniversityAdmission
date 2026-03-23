@@ -1,0 +1,126 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-5">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h4>Създай нов акаунт</h4>
+            <hr />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- Име -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.FirstName" class="form-control" placeholder="Име" />
+                <label asp-for="Input.FirstName"></label>
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.MiddleName" class="form-control" placeholder="Презиме" />
+                <label asp-for="Input.MiddleName"></label>
+                <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
+            </div>
+
+            <!-- Фамилия -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.LastName" class="form-control" placeholder="Фамилия" />
+                <label asp-for="Input.LastName"></label>
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.School" class="form-control" placeholder="Училище" />
+                <label asp-for="Input.School"></label>
+                <span asp-validation-for="Input.School" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.City" class="form-control" placeholder="Град" />
+                <label asp-for="Input.City"></label>
+                <span asp-validation-for="Input.City" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Address" class="form-control" placeholder="Адрес" />
+                <label asp-for="Input.Address"></label>
+                <span asp-validation-for="Input.Address" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Телефон" />
+                <label asp-for="Input.PhoneNumber"></label>
+                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email"
+                       class="form-control"
+                       autocomplete="username"
+                       placeholder="name@example.com" />
+                <label asp-for="Input.Email"></label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <!-- Парола -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password"
+                       class="form-control"
+                       autocomplete="new-password"
+                       placeholder="Парола" />
+                <label asp-for="Input.Password"></label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <!-- Повтори парола -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword"
+                       class="form-control"
+                       autocomplete="new-password"
+                       placeholder="Повтори паролата" />
+                <label asp-for="Input.ConfirmPassword"></label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">
+                Регистрация
+            </button>
+        </form>
+    </div>
+
+    <div class="col-md-7">
+        <section>
+            <h5>Външни услуги</h5>
+            <hr />
+            @if ((Model.ExternalLogins?.Count ?? 0) == 0)
+            {
+            <p class="text-muted">
+                Няма конфигурирани външни услуги за вход.
+            </p>
+            }
+            else
+            {
+            <form asp-page="./ExternalLogin"
+                  asp-route-returnUrl="@Model.ReturnUrl"
+                  method="post">
+                @foreach (var provider in Model.ExternalLogins!)
+                {
+                <button type="submit"
+                        class="btn btn-outline-primary me-2"
+                        name="provider"
+                        value="@provider.Name">
+                    @provider.DisplayName
+                </button>
+                }
+            </form>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}

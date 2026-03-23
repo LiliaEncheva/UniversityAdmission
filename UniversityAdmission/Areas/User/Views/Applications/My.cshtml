@@ -1,0 +1,46 @@
+﻿@model IEnumerable<UniversityAdmission.Models.Entities.Application>
+
+@{
+    ViewData["Title"] = "Моите кандидатури";
+}
+
+<h2>Моите кандидатури</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Дата</th>
+            <th>Бал</th>
+            <th>Статус</th>
+            <th>Желания</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var app in Model)
+        {
+            <tr>
+                <td>@app.CreatedOn.ToString("dd.MM.yyyy")</td>
+                <td>@app.TotalScore</td>
+                <td>
+                    @switch (app.Status)
+                    {
+                        case UniversityAdmission.Models.Enums.ApplicationStatus.Confirmed:
+                            <span class="badge bg-warning text-dark">Подадена</span>
+                            break;
+                        case UniversityAdmission.Models.Enums.ApplicationStatus.NotAccepted:
+                            <span class="badge bg-secondary">Не е приет</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    <ol class="mb-0">
+                        @foreach (var s in app.ApplicationSpecialities.OrderBy(x => x.PreferenceOrder))
+                        {
+                            <li>@s.Speciality.Name</li>
+                        }
+                    </ol>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

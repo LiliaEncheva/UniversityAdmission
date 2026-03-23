@@ -1,0 +1,22 @@
+﻿@model UniversityAdmission.Models.Identity.ApplicationUser
+
+@{
+    ViewData["Title"] = "Моят профил";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="card" style="max-width:600px;">
+    <div class="card-body">
+        <h5 class="card-title">Лични данни</h5>
+        <p><strong>Име:</strong> @Model.FirstName</p>
+        <p><strong>Презиме:</strong> @Model.MiddleName</p>
+        <p><strong>Фамилия:</strong> @Model.LastName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Телефон:</strong> @Model.PhoneNumber</p>
+        <p><strong>Училище:</strong> @Model.School</p>
+        <p><strong>Град:</strong> @Model.City</p>
+        <p><strong>Адрес:</strong> @Model.Address</p>
+    </div>
+</div>

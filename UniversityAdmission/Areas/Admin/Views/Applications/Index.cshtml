@@ -1,0 +1,93 @@
+﻿@model IEnumerable<UniversityAdmission.Models.Entities.Application>
+
+@{
+    ViewData["Title"] = "Кандидатури";
+}
+
+<h2>Подадени кандидатури</h2>
+
+<!-- Бутон за публикуване на резултатите -->
+<form asp-area="Admin" asp-controller="Applications" asp-action="PublishResults" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-success">
+        Публикувай резултати
+    </button>
+</form>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Студент</th>
+            <th>Бал</th>
+            <th>Статус</th>
+            <th>Специалности</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var app in Model)
+        {
+            <tr>
+                <td>@app.User.FirstName @app.User.LastName</td>
+                <td>@app.TotalScore</td>
+                <td>
+                    @switch (app.Status)
+                    {
+                        case UniversityAdmission.Models.Enums.ApplicationStatus.NotAccepted:
+                            <span class="badge bg-secondary">Не е разгледана</span>
+                            ;
+                            break;
+                        case UniversityAdmission.Models.Enums.ApplicationStatus.Pending:
+                            <span class="badge bg-warning">В процес</span>
+                            ;
+                            break;
+                        case UniversityAdmission.Models.Enums.ApplicationStatus.Confirmed:
+                            <span class="badge bg-success">Приета</span>
+                            ;
+                            break;
+                        case UniversityAdmission.Models.Enums.ApplicationStatus.Rejected:
+                            <span class="badge bg-danger">Отхвърлен</span>
+                            ;
+                            break;
+                    }
+                </td>
+                <td>
+                    @foreach (var spec in app.ApplicationSpecialities.OrderBy(x => x.PreferenceOrder))
+                    {
+                        <div>@spec.PreferenceOrder. @spec.Speciality.Name</div>
+                    }
+                </td>
+                <td>
+                    @if (app.Status == UniversityAdmission.Models.Enums.ApplicationStatus.Pending ||
+                                    app.Status == UniversityAdmission.Models.Enums.ApplicationStatus.NotAccepted)
+                    {
+                        <form asp-area="Admin" asp-controller="Applications" asp-action="Confirm" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@app.Id" />
+                            <button class="btn btn-success btn-sm">Приеми кандидатурата</button>
+                        </form>
+
+                        <form asp-area="Admin" asp-controller="Applications" asp-action="Reject" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@app.Id" />
+                            <button class="btn btn-danger btn-sm">Отхвърли</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-success">
+                            @(app.Status == UniversityAdmission.Models.Enums.ApplicationStatus.Confirmed ? "Приет" : "Отхвърлен")
+                        </span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

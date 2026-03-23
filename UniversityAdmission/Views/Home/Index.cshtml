@@ -1,8 +1,78 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Начало";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold">
+                Добре дошли в <span class="text-primary">UniversityAdmission</span>
+            </h1>
+            <p class="lead mt-3">
+                Онлайн система за кандидатстване във висши учебни заведения.
+                Подайте документи, въведете оценки и следете класирането си – бързо и лесно.
+            </p>
+
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg me-2">
+                    Регистрация
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-lg">
+                    Вход
+                </a>
+            }
+            else
+            {
+                <a asp-area="User" asp-controller="Applications" asp-action="Create"
+                   class="btn btn-success btn-lg">
+                    Кандидатствай сега
+                </a>
+            }
+        </div>
+
+        <div class="col-md-6 text-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png"
+                 class="img-fluid"
+                 style="max-height: 320px;"
+                 alt="University">
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">📊 Моите оценки</h5>
+                    <p class="card-text">
+                        Въведете оценките си и автоматично изчислете общия си бал.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🎓 Специалности</h5>
+                    <p class="card-text">
+                        Изберете желаните специалности и подредете приоритетите си.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">📄 Кандидатури</h5>
+                    <p class="card-text">
+                        Следете статуса на кандидатурите си и резултатите от класирането.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,36 +1,85 @@
-namespace UniversityAdmission
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
+using UniversityAdmission.Data;
+using UniversityAdmission.Data.Seed;
+using UniversityAdmission.Models.Identity;
+using UniversityAdmission.Services;
+using UniversityAdmission.Services.Implementations;
+using UniversityAdmission.Services.Interfaces;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1?? Добавяне на MVC и Razor Pages
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+// 2?? Настройка на DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 3?? Настройка на Identity с ApplicationUser и роли
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+    options.SignIn.RequireConfirmedAccount = false;
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
-            var app = builder.Build();
+// 4?? Dummy Email Sender
+builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+// 5?? Custom Services
+builder.Services.AddScoped<IAdmissionService, AdmissionService>();
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+var app = builder.Build();
 
-            app.UseRouting();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
 
-            app.UseAuthorization();
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
-            app.Run();
-        }
-    }
+    await SeedRoles.SeedAsync(roleManager);
+    await SeedAdmin.SeedAsync(userManager, roleManager);
+    await SeedSpecialities.SeedAsync(context);
+    await SeedData.Initialize(context, userManager);
 }
+
+// 7?? Middleware Pipeline
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// 8?? Endpoints
+// Razor Pages (Identity)
+app.MapRazorPages();
+
+// Areas
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+// Default
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
