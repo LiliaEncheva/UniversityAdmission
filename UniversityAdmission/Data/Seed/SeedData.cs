@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UniversityAdmission.Data;
 using UniversityAdmission.Models.Entities;
@@ -37,7 +37,11 @@ namespace UniversityAdmission.Data.Seed
                     UserName = "student1@uni.bg",
                     Email = "student1@uni.bg",
                     FirstName = "Ivan",
+                    MiddleName = "Ivanov",
                     LastName = "Ivanov",
+                    School = "SMG",
+                    City = "Sofia",
+                    Address = "Sofia 1000",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(user, "Password123!");

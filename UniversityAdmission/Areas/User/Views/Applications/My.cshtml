@@ -1,4 +1,4 @@
-﻿@model IEnumerable<UniversityAdmission.Models.Entities.Application>
+@model IEnumerable<UniversityAdmission.Models.Entities.Application>
 
 @{
     ViewData["Title"] = "Моите кандидатури";
@@ -36,7 +36,13 @@
                     <ol class="mb-0">
                         @foreach (var s in app.ApplicationSpecialities.OrderBy(x => x.PreferenceOrder))
                         {
-                            <li>@s.Speciality.Name</li>
+                            <li>
+                                @s.Speciality.Name
+                                @if (s.IsAdmitted)
+                                {
+                                    <span class="badge bg-success ms-2">Приет</span>
+                                }
+                            </li>
                         }
                     </ol>
                 </td>

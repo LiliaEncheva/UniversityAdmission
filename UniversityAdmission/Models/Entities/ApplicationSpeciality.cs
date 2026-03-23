@@ -1,4 +1,4 @@
-﻿namespace UniversityAdmission.Models.Entities
+namespace UniversityAdmission.Models.Entities
 {
     public class ApplicationSpeciality
     {
@@ -11,5 +11,7 @@
         public Speciality Speciality { get; set; }
 
         public int PreferenceOrder { get; set; }
+
+        public bool IsAdmitted { get; set; }
     }
 }

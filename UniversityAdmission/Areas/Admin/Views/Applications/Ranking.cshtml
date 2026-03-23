@@ -1,4 +1,4 @@
-﻿@model IEnumerable<UniversityAdmission.Models.Entities.Application>
+@model IEnumerable<UniversityAdmission.Models.Entities.Application>
 
 <h2>Резултати от класирането</h2>
 
@@ -22,7 +22,7 @@
                     <td>@app.TotalScore</td>
                     <td>@choice.Speciality.Name</td>
                     <td>@choice.PreferenceOrder</td>
-                    <td>@app.Status</td>
+                    <td>@(choice.IsAdmitted ? "Приет" : "Не е приет")</td>
                 </tr>
             }
         }

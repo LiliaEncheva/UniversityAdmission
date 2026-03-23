@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityAdmission.Data;
@@ -107,6 +107,13 @@ namespace UniversityAdmission.Areas.Admin.Controllers
                 app.Status = ApplicationStatus.NotAccepted;
                 app.IsConfirmed = false;
 
+                // Зануляваме старите резултати от предишни класирания,
+                // за да гарантираме точни данни при повторно стартиране на алгоритъма.
+                foreach (var c in app.ApplicationSpecialities)
+                {
+                    c.IsAdmitted = false;
+                }
+
                 // Минаваме по желанията (по ред на предпочитание)
                 foreach (var choice in app.ApplicationSpecialities
                                            .OrderBy(c => c.PreferenceOrder))
@@ -119,6 +126,7 @@ namespace UniversityAdmission.Areas.Admin.Controllers
                         // Приемаме кандидата
                         app.Status = ApplicationStatus.Confirmed;
                         app.IsConfirmed = true;
+                        choice.IsAdmitted = true;
 
                         // Увеличаваме броя приети в тази специалност
                         specialityAcceptedCount[speciality.Id]++;

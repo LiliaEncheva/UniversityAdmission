@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using UniversityAdmission.Models.Identity;
 
 namespace UniversityAdmission.Data.Seed
@@ -25,7 +25,11 @@ namespace UniversityAdmission.Data.Seed
                     Email = adminEmail,
                     EmailConfirmed = true,
                     FirstName = "Admin",
-                    LastName = "Admin"
+                    MiddleName = "Adminov",
+                    LastName = "Admin",
+                    School = "System",
+                    City = "System",
+                    Address = "System Address"
                 };
 
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
