@@ -85,7 +85,10 @@ namespace UniversityAdmission.Areas.Admin.Controllers
             // Запазваме резултатите
             await _context.SaveChangesAsync();
 
-            return View(applications); // View, което показва резултатите
+            // Сортиране по бал (низходящо) преди показване
+            var sorted = applications.OrderByDescending(a => a.TotalScore).ToList();
+
+            return View(sorted); // View, което показва резултатите
         }
 
         // ===============================

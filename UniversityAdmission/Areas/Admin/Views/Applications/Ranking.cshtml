@@ -13,18 +13,16 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var app in Model)
+        @foreach (var app in Model.OrderByDescending(a => a.TotalScore))
         {
-            foreach (var choice in app.ApplicationSpecialities.OrderBy(c => c.PreferenceOrder))
-            {
-                <tr>
-                    <td>@app.User.FullName</td>
-                    <td>@app.TotalScore</td>
-                    <td>@choice.Speciality.Name</td>
-                    <td>@choice.PreferenceOrder</td>
-                    <td>@(choice.IsAdmitted ? "Приет" : "Не е приет")</td>
-                </tr>
-            }
+            var admitted = app.ApplicationSpecialities.FirstOrDefault(c => c.IsAdmitted);
+            <tr>
+                <td>@app.User.FullName</td>
+                <td>@app.TotalScore</td>
+                <td>@(admitted != null ? admitted.Speciality.Name : "—")</td>
+                <td>@(admitted != null ? admitted.PreferenceOrder.ToString() : "—")</td>
+                <td>@(admitted != null ? "Приет" : "Не е приет")</td>
+            </tr>
         }
     </tbody>
 </table>
