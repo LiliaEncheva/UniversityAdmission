@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityAdmission.Data;
+using UniversityAdmission.Models;
 using UniversityAdmission.Models.Enums;
 using UniversityAdmission.Models.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace UniversityAdmission.Areas.Admin.Controllers
 {
@@ -65,8 +67,10 @@ namespace UniversityAdmission.Areas.Admin.Controllers
         // ===============================
         // КЛАСИРАНЕ И ПУБЛИКУВАНЕ НА РЕЗУЛТАТИТЕ
         // ===============================
-        public async Task<IActionResult> Ranking()
+        public async Task<IActionResult> Ranking(int? specialityId, int? preferenceOrder, ApplicationStatus? status, int page = 1)
         {
+            const int pageSize = 10;
+
             // Вземаме всички кандидатури до крайния срок
             var applications = await _context.Applications
                 .Include(a => a.ApplicationSpecialities)
@@ -79,16 +83,68 @@ namespace UniversityAdmission.Areas.Admin.Controllers
                 .Include(s => s.ApplicationSpecialities)
                 .ToListAsync();
 
-            // Стартираме класирането
+            // Стартираме класирането (за да са актуални данните)
             RunAdmission(specialities, applications);
-
-            // Запазваме резултатите
             await _context.SaveChangesAsync();
 
-            // Сортиране по бал (низходящо) преди показване
-            var sorted = applications.OrderByDescending(a => a.TotalScore).ToList();
+            // Филтриране
+            var query = applications.AsEnumerable(); // Сменяме на AsEnumerable, защото RunAdmission вече е заредил всичко в паметта
 
-            return View(sorted); // View, което показва резултатите
+            if (status.HasValue)
+            {
+                query = query.Where(a => a.Status == status.Value);
+            }
+
+            if (specialityId.HasValue)
+            {
+                // Показваме тези, които са приети в тази специалност
+                query = query.Where(a => a.ApplicationSpecialities.Any(s => s.IsAdmitted && s.SpecialityId == specialityId.Value));
+            }
+
+            if (preferenceOrder.HasValue)
+            {
+                // Показваме тези, които са приети по това желание
+                query = query.Where(a => a.ApplicationSpecialities.Any(s => s.IsAdmitted && s.PreferenceOrder == preferenceOrder.Value));
+            }
+
+            var sorted = query.OrderByDescending(a => a.TotalScore).ToList();
+
+            var totalItems = sorted.Count;
+            var pagedApplications = sorted.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var viewModel = new RankingViewModel
+            {
+                Applications = pagedApplications,
+                SpecialityId = specialityId,
+                PreferenceOrder = preferenceOrder,
+                Status = status,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                TotalItems = totalItems,
+                Specialities = specialities.Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = s.Name,
+                    Selected = s.Id == specialityId
+                }).ToList(),
+                Statuses = Enum.GetValues(typeof(ApplicationStatus))
+                    .Cast<ApplicationStatus>()
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.ToString(),
+                        Text = s switch
+                        {
+                            ApplicationStatus.Pending => "Изчакваща",
+                            ApplicationStatus.NotAccepted => "Неприет",
+                            ApplicationStatus.Confirmed => "Приет",
+                            ApplicationStatus.Rejected => "Отхвърлен",
+                            _ => s.ToString()
+                        },
+                        Selected = s == status
+                    }).ToList()
+            };
+
+            return View(viewModel);
         }
 
         // ===============================

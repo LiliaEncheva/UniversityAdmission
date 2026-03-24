@@ -1,28 +1,197 @@
-@model IEnumerable<UniversityAdmission.Models.Entities.Application>
+@model UniversityAdmission.Models.RankingViewModel
 
-<h2>Резултати от класирането</h2>
+@{
+    ViewData["Title"] = "Резултати от класирането";
+}
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Кандидат</th>
-            <th>Бал</th>
-            <th>Специалност</th>
-            <th>Ред на желание</th>
-            <th>Статус</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var app in Model.OrderByDescending(a => a.TotalScore))
-        {
-            var admitted = app.ApplicationSpecialities.FirstOrDefault(c => c.IsAdmitted);
-            <tr>
-                <td>@app.User.FullName</td>
-                <td>@app.TotalScore</td>
-                <td>@(admitted != null ? admitted.Speciality.Name : "—")</td>
-                <td>@(admitted != null ? admitted.PreferenceOrder.ToString() : "—")</td>
-                <td>@(admitted != null ? "Приет" : "Не е приет")</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary"><i class="fas fa-list-ol me-2"></i>Резултати от класирането</h2>
+        <form asp-action="PublishResults" method="post">
+            <button type="submit" class="btn btn-success shadow-sm">
+                <i class="fas fa-upload me-1"></i> Преизчисли и Публикувай
+            </button>
+        </form>
+    </div>
+
+    <!-- Филтри -->
+    <div class="card shadow-sm mb-4 border-0 bg-light">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Специалност</label>
+                    <select name="specialityId" asp-for="SpecialityId" asp-items="Model.Specialities" class="form-select border-0 shadow-sm">
+                        <option value="">Всички специалности</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Ред на желание</label>
+                    <select name="preferenceOrder" asp-for="PreferenceOrder" class="form-select border-0 shadow-sm">
+                        <option value="">Всички желания</option>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <option value="@i">@i-ро желание</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Статус</label>
+                    <select name="status" asp-for="Status" asp-items="Model.Statuses" class="form-select border-0 shadow-sm">
+                        <option value="">Всички статуси</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm flex-grow-1">
+                        <i class="fas fa-filter me-1"></i> Филтрирай
+                    </button>
+                    <a asp-action="Ranking" class="btn btn-outline-secondary shadow-sm">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Таблица с резултати -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th class="ps-4">№</th>
+                            <th>Кандидат</th>
+                            <th class="text-center">Бал</th>
+                            <th>Специалност (Приет в)</th>
+                            <th class="text-center">Желание №</th>
+                            <th class="text-center">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Applications.Any())
+                        {
+                            int index = (Model.CurrentPage - 1) * 10 + 1;
+                            foreach (var app in Model.Applications)
+                            {
+                                var admitted = app.ApplicationSpecialities.FirstOrDefault(c => c.IsAdmitted);
+                                <tr>
+                                    <td class="ps-4 text-muted">@(index++)</td>
+                                    <td>
+                                        <div class="fw-bold">@app.User.FullName</div>
+                                        <div class="small text-muted">@app.User.Email</div>
+                                    </td>
+                                    <td class="text-center fw-bold text-primary">@app.TotalScore.ToString("F2")</td>
+                                    <td>
+                                        @if (admitted != null)
+                                        {
+                                            <span class="badge bg-info text-dark">@admitted.Speciality.Name</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (admitted != null)
+                                        {
+                                            <span class="badge rounded-pill bg-light text-dark border">@admitted.PreferenceOrder</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (admitted != null)
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-check me-1"></i> Приет</span>
+                                        }
+                                        else
+                                            {
+                                            <span class="badge bg-secondary"><i class="fas fa-times me-1"></i> Не е приет</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fas fa-search fa-3x mb-3 d-block opacity-25"></i>
+                                    Няма намерени резултати за избраните филтри.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Пагинация -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center shadow-sm">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Ranking" 
+                       asp-route-page="@(Model.CurrentPage - 1)" 
+                       asp-route-specialityId="@Model.SpecialityId"
+                       asp-route-preferenceOrder="@Model.PreferenceOrder"
+                       asp-route-status="@Model.Status">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Ranking" 
+                           asp-route-page="@i"
+                           asp-route-specialityId="@Model.SpecialityId"
+                           asp-route-preferenceOrder="@Model.PreferenceOrder"
+                           asp-route-status="@Model.Status">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Ranking" 
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-specialityId="@Model.SpecialityId"
+                       asp-route-preferenceOrder="@Model.PreferenceOrder"
+                       asp-route-status="@Model.Status">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+<style>
+    .pagination .page-link {
+        color: #0d6efd;
+        border: none;
+        margin: 0 2px;
+        border-radius: 5px;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .table thead th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+</style>
