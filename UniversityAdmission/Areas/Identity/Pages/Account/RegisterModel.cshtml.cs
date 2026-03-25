@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -54,32 +54,32 @@ namespace UniversityAdmission.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "Паролите не съвпадат.")]
             public string ConfirmPassword { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Полето 'Име' е задължително.")]
             [Display(Name = "Име")]
             public string FirstName { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Полето 'Презиме' е задължително.")]
             [Display(Name = "Презиме")]
             public string MiddleName { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Полето 'Фамилия' е задължително.")]
             [Display(Name = "Фамилия")]
             public string LastName { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Полето 'Училище' е задължително.")]
             [Display(Name = "Училище")]
             public string School { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Полето 'Град' е задължително.")]
             [Display(Name = "Град")]
             public string City { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Полето 'Адрес' е задължително.")]
             [Display(Name = "Адрес")]
             public string Address { get; set; }
 
-            [Required]
-            [Phone]
+            [Required(ErrorMessage = "Полето 'Телефон' е задължително.")]
+            [Phone(ErrorMessage = "Невалиден формат на телефонния номер.")]
             [Display(Name = "Телефон")]
             public string PhoneNumber { get; set; }
         }

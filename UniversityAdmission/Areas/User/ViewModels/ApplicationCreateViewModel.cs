@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace UniversityAdmission.Areas.User.ViewModels
 {
     public class ApplicationCreateViewModel : IValidatableObject
     {
+        [Display(Name = "Общ бал")]
         public decimal TotalScore { get; set; }
 
         [Required(ErrorMessage = "Трябва да изберете първа специалност.")]
+        [Display(Name = "Първо желание")]
         public int? FirstChoiceId { get; set; }
 
+        [Display(Name = "Второ желание")]
         public int? SecondChoiceId { get; set; }
 
+        [Display(Name = "Трето желание")]
         public int? ThirdChoiceId { get; set; }
 
         public List<SelectListItem> Specialities { get; set; } = new();

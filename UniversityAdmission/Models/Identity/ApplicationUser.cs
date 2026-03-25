@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using UniversityAdmission.Models.Entities;
 
@@ -6,27 +6,27 @@ namespace UniversityAdmission.Models.Identity
 {
     public class ApplicationUser : IdentityUser
     {
-        [Required]
+        [Required(ErrorMessage = "Името е задължително.")]
         [Display(Name = "Име")]
         public string FirstName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Презимето е задължително.")]
         [Display(Name = "Презиме")]
         public string MiddleName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Фамилията е задължителна.")]
         [Display(Name = "Фамилия")]
         public string LastName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Училището е задължително.")]
         [Display(Name = "Училище")]
         public string School { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Градът е задължителен.")]
         [Display(Name = "Град")]
         public string City { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Адресът е задължителен.")]
         [Display(Name = "Адрес")]
         public string Address { get; set; }
 

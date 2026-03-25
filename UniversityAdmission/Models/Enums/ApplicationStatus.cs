@@ -1,11 +1,19 @@
-﻿namespace UniversityAdmission.Models.Enums
+using System.ComponentModel.DataAnnotations;
+
+namespace UniversityAdmission.Models.Enums
 {
     public enum ApplicationStatus
     {
+        [Display(Name = "В изчакване")]
         Pending = 0,
-        NotAccepted = 1,   // Не е приет (по условие)
-        Confirmed = 2,// Потвърдена кандидатура
+
+        [Display(Name = "Не е приет")]
+        NotAccepted = 1,
+
+        [Display(Name = "Потвърдена")]
+        Confirmed = 2,
+
+        [Display(Name = "Отхвърлена")]
         Rejected = 3
-        
     }
 }
