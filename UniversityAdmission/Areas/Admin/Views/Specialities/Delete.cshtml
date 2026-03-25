@@ -1,4 +1,4 @@
-﻿@model UniversityAdmission.Areas.Admin.ViewModels.SpecialityViewModel
+@model UniversityAdmission.Areas.Admin.ViewModels.SpecialityViewModel
 
 @{
     ViewData["Title"] = "Изтрий специалност";
@@ -18,7 +18,7 @@
     </dl>
 </div>
 
-<form asp-action="DeleteConfirmed" method="post">
+<form asp-action="Delete" method="post">
     <input type="hidden" asp-for="Id" />
     <button type="submit" class="btn btn-danger">Да, изтрий</button>
     <a asp-action="Index" class="btn btn-secondary">Откажи</a>

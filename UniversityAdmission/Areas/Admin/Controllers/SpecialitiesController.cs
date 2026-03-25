@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using UniversityAdmission.Data;
 using UniversityAdmission.Models.Entities;
@@ -37,13 +37,18 @@ namespace UniversityAdmission.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/Specialities/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SpecialityViewModel model)
         {
             if (ModelState.IsValid)
             {
+                if (await _context.Specialities.AnyAsync(s => s.Name == model.Name))
+                {
+                    ModelState.AddModelError("Name", "Специалност с това име вече съществува.");
+                    return View(model);
+                }
+
                 var entity = new Speciality
                 {
                     Name = model.Name,
@@ -71,7 +76,6 @@ namespace UniversityAdmission.Areas.Admin.Controllers
             return View(model);
         }
 
-        // POST: Admin/Specialities/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SpecialityViewModel model)
@@ -80,6 +84,12 @@ namespace UniversityAdmission.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
+                if (await _context.Specialities.AnyAsync(s => s.Name == model.Name && s.Id != id))
+                {
+                    ModelState.AddModelError("Name", "Специалност с това име вече съществува.");
+                    return View(model);
+                }
+
                 var entity = await _context.Specialities.FindAsync(id);
                 if (entity == null) return NotFound();
 
