@@ -1,4 +1,4 @@
-﻿@model IEnumerable<UniversityAdmission.Models.Entities.Application>
+@model IEnumerable<UniversityAdmission.Models.Entities.Application>
 
 @{
     ViewData["Title"] = "Кандидатури";
@@ -28,15 +28,14 @@
             <th>Бал</th>
             <th>Статус</th>
             <th>Специалности</th>
-            <th>Действие</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var app in Model)
         {
             <tr>
-                <td>@app.User.FirstName @app.User.LastName</td>
-                <td>@app.TotalScore</td>
+                <td>@app.User.FullName</td>
+                <td>@app.TotalScore.ToString("F2")</td>
                 <td>
                     @switch (app.Status)
                     {
@@ -53,7 +52,7 @@
                             ;
                             break;
                         case UniversityAdmission.Models.Enums.ApplicationStatus.Rejected:
-                            <span class="badge bg-danger">Отхвърлен</span>
+                            <span class="badge bg-danger">Отхвърлена</span>
                             ;
                             break;
                     }
@@ -62,29 +61,6 @@
                     @foreach (var spec in app.ApplicationSpecialities.OrderBy(x => x.PreferenceOrder))
                     {
                         <div>@spec.PreferenceOrder. @spec.Speciality.Name</div>
-                    }
-                </td>
-                <td>
-                    @if (app.Status == UniversityAdmission.Models.Enums.ApplicationStatus.Pending ||
-                                    app.Status == UniversityAdmission.Models.Enums.ApplicationStatus.NotAccepted)
-                    {
-                        <form asp-area="Admin" asp-controller="Applications" asp-action="Confirm" method="post" style="display:inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@app.Id" />
-                            <button class="btn btn-success btn-sm">Приеми кандидатурата</button>
-                        </form>
-
-                        <form asp-area="Admin" asp-controller="Applications" asp-action="Reject" method="post" style="display:inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@app.Id" />
-                            <button class="btn btn-danger btn-sm">Отхвърли</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <span class="text-success">
-                            @(app.Status == UniversityAdmission.Models.Enums.ApplicationStatus.Confirmed ? "Приет" : "Отхвърлен")
-                        </span>
                     }
                 </td>
             </tr>

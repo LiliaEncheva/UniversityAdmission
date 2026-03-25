@@ -44,27 +44,6 @@ namespace UniversityAdmission.Areas.Admin.Controllers
         }
 
         // ===============================
-        // ПОТВЪРЖДАВАНЕ НА КАНДИДАТУРА
-        // ===============================
-        [HttpPost]
-        public async Task<IActionResult> Confirm(int id)
-        {
-            var application = await _context.Applications
-                .Include(a => a.User)
-                .FirstOrDefaultAsync(a => a.Id == id);
-
-            if (application != null)
-            {
-                application.Status = ApplicationStatus.Confirmed; // Приет
-                application.IsConfirmed = true; // за студента
-
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ===============================
         // КЛАСИРАНЕ И ПУБЛИКУВАНЕ НА РЕЗУЛТАТИТЕ
         // ===============================
         public async Task<IActionResult> Ranking(int? specialityId, int? preferenceOrder, ApplicationStatus? status, int page = 1)

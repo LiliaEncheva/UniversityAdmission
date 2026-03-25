@@ -16,65 +16,87 @@ namespace UniversityAdmission.Data.Seed
             // Миграции
             await context.Database.MigrateAsync();
 
-            // 1. Seed специалности
+            // 1. Cleanup "Testov" middle names and seed roles/admin if needed
+            var usersToFix = await context.Users.Where(u => u.MiddleName == "Testov").ToListAsync();
+            foreach (var user in usersToFix)
+            {
+                user.MiddleName = "Георгиев"; // Заменяме с често срещано име
+            }
+            if (usersToFix.Any()) await context.SaveChangesAsync();
+
+            // 2. Seed специалности (ако няма)
             if (!await context.Specialities.AnyAsync())
             {
                 var specs = new[]
                 {
-                    new Speciality { Name = "Компютърни науки", Seats = 50 },
-                    new Speciality { Name = "Математика", Seats = 30 },
-                    new Speciality { Name = "Физика", Seats = 25 }
+                    new Speciality { Name = "Компютърни науки", Seats = 2 },
+                    new Speciality { Name = "Софтуерно инженерство", Seats = 3 },
+                    new Speciality { Name = "Информационни системи", Seats = 2 }
                 };
                 context.Specialities.AddRange(specs);
                 await context.SaveChangesAsync();
             }
 
-            // 2. Seed студент
-            if (!await context.Users.AnyAsync(u => u.UserName == "student1@uni.bg"))
+            var specialities = await context.Specialities.ToListAsync();
+
+            // 3. Seed разнообразни студенти и кандидатури
+            var testStudents = new[]
             {
-                var user = new ApplicationUser
-                {
-                    UserName = "student1@uni.bg",
-                    Email = "student1@uni.bg",
-                    FirstName = "Ivan",
-                    MiddleName = "Ivanov",
-                    LastName = "Ivanov",
-                    School = "SMG",
-                    City = "Sofia",
-                    Address = "Sofia 1000",
-                    EmailConfirmed = true
-                };
-                await userManager.CreateAsync(user, "Password123!");
-            }
+                new { Email = "ivan@uni.bg", First = "Иван", Middle = "Георгиев", Last = "Иванов", Score = 5.80m, Prefs = new[] {0, 1, 2} },
+                new { Email = "maria@uni.bg", First = "Мария", Middle = "Ангелова", Last = "Петрова", Score = 5.95m, Prefs = new[] {0, 2} },
+                new { Email = "georgi@uni.bg", First = "Георги", Middle = "Борисов", Last = "Димитров", Score = 5.50m, Prefs = new[] {1, 0, 2} },
+                new { Email = "elena@uni.bg", First = "Елена", Middle = "Тодорова", Last = "Колева", Score = 5.20m, Prefs = new[] {0, 1} },
+                new { Email = "stefan@uni.bg", First = "Стефан", Middle = "Василев", Last = "Стойнов", Score = 4.80m, Prefs = new[] {2, 0} },
+                new { Email = "anna@uni.bg", First = "Анна", Middle = "Маринова", Last = "Павлова", Score = 3.50m, Prefs = new[] {0} },
+                new { Email = "dimitar@uni.bg", First = "Димитър", Middle = "Николов", Last = "Колев", Score = 5.75m, Prefs = new[] {0, 1} },
+            };
 
-            var student = await context.Users
-                .FirstOrDefaultAsync(u => u.UserName == "student1@uni.bg");
-
-            // 3. Seed кандидатура
-            if (!await context.Applications.AnyAsync())
+            foreach (var s in testStudents)
             {
-                var app = new Application
+                var user = await userManager.FindByEmailAsync(s.Email);
+                if (user == null)
                 {
-                    UserId = student.Id,
-                    TotalScore = 5.5m,
-                    CreatedOn = DateTime.Now,
-                    Status = ApplicationStatus.Confirmed,
-                    IsConfirmed = false
-                };
-                context.Applications.Add(app);
-                await context.SaveChangesAsync();
+                    user = new ApplicationUser
+                    {
+                        UserName = s.Email,
+                        Email = s.Email,
+                        FirstName = s.First,
+                        MiddleName = s.Middle,
+                        LastName = s.Last,
+                        School = "ПМГ",
+                        City = "София",
+                        Address = "ул. Примерна 123",
+                        EmailConfirmed = true
+                    };
+                    await userManager.CreateAsync(user, "Password123!");
+                }
 
-                // Добавяне на първо желание
-                var firstSpec = await context.Specialities.FirstAsync();
-                context.ApplicationSpecialities.Add(new ApplicationSpeciality
+                // Кандидатура
+                if (!await context.Applications.AnyAsync(a => a.UserId == user.Id))
                 {
-                    ApplicationId = app.Id,
-                    SpecialityId = firstSpec.Id,
-                    PreferenceOrder = 1
-                });
+                    var app = new Application
+                    {
+                        UserId = user.Id,
+                        TotalScore = s.Score,
+                        CreatedOn = DateTime.Now,
+                        Status = ApplicationStatus.NotAccepted,
+                        IsConfirmed = false
+                    };
+                    context.Applications.Add(app);
+                    await context.SaveChangesAsync();
 
-                await context.SaveChangesAsync();
+                    for (int i = 0; i < s.Prefs.Length; i++)
+                    {
+                        context.ApplicationSpecialities.Add(new ApplicationSpeciality
+                        {
+                            ApplicationId = app.Id,
+                            SpecialityId = specialities[s.Prefs[i]].Id,
+                            PreferenceOrder = i + 1
+                        });
+                    }
+                    await context.SaveChangesAsync();
+                }
             }
         }
     }
-}
+}
