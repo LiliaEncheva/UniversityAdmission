@@ -26,21 +26,37 @@ namespace UniversityAdmission.Areas.Admin.Controllers
         // ===============================
         // СПИСЪК С КАНДИДАТУРИ
         // ===============================
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
+            const int pageSize = 10;
+
             // Проверка за изтекъл срок
             if (DateTime.Now > ApplicationDeadline)
             {
                 return RedirectToAction("Ranking");
             }
 
-            var applications = await _context.Applications
+            var query = _context.Applications
                 .Include(a => a.User)
                 .Include(a => a.ApplicationSpecialities)
-                    .ThenInclude(s => s.Speciality)
+                    .ThenInclude(s => s.Speciality);
+
+            var totalItems = await query.CountAsync();
+            var applications = await query
+                .OrderByDescending(a => a.CreatedOn) // Сортиране по дата на създаване
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return View(applications);
+            var viewModel = new ApplicationsIndexViewModel
+            {
+                Applications = applications,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                TotalItems = totalItems
+            };
+
+            return View(viewModel);
         }
 
         // ===============================
