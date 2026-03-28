@@ -114,7 +114,7 @@ namespace UniversityAdmission.Areas.Admin.Controllers
                         Text = s switch
                         {
                             ApplicationStatus.Pending => "Изчакваща",
-                            ApplicationStatus.NotAccepted => "Неприет",
+                            ApplicationStatus.NotAccepted => "Не е приет",
                             ApplicationStatus.Confirmed => "Приет",
                             ApplicationStatus.Rejected => "Отхвърлен",
                             _ => s.ToString()
