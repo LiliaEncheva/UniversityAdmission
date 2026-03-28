@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Начало";
 }
 
@@ -24,9 +24,16 @@
                 </a>
             }
             
+            else if (User.IsInRole("Admin"))
+            {
+                <a asp-area="Admin" asp-controller="Applications" asp-action="Index"
+                   class="btn btn-primary btn-lg">
+                    Виж кандидатури
+                </a>
+            }
             else
             {
-                <a asp-area="User" asp-controller="Applications" asp-action="Create"
+                <a asp-area="User" asp-controller="Grades" asp-action="Create"
                    class="btn btn-success btn-lg">
                     Кандидатствай сега
                 </a>
